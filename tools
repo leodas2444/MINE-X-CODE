@@ -1,0 +1,118 @@
+#!/bin/bash
+
+# ==================================================
+#          MINE X SERVER UTILITY MENU | v2.0
+# ==================================================
+
+# --- COLORS ---
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+GRAY='\033[1;30m'
+NC='\033[0m'
+
+# --- HELPER FUNCTIONS ---
+pause() {
+    echo ""
+    read -n 1 -s -r -p "Press any key to continue..."
+    echo ""
+}
+
+# ===================== TOOLS MENU =====================
+tools_menu() {
+    while true; do
+        clear
+
+        # HEADER
+        echo -e "${CYAN}════════════════════════════════════════════════════════════${NC}"
+        echo -e "${PURPLE}              ⚡ MINE X SERVER UTILITIES ⚡${NC}"
+        echo -e "${CYAN}════════════════════════════════════════════════════════════${NC}"
+        echo -e "${GRAY} Host: $(hostname) | User: $(whoami)${NC}"
+        echo ""
+
+        # NETWORK
+        echo -e "${BLUE}  [ ACCESS & NETWORK ]${NC}"
+        echo -e "  ${GREEN}1)${NC} Root Access         ${GRAY}:: Enable Root/Sudo${NC}"
+        echo -e "  ${GREEN}2)${NC} Tailscale           ${GRAY}:: Mesh VPN Setup${NC}"
+        echo -e "  ${GREEN}3)${NC} Zerotier            ${GRAY}:: Private Network${NC}"
+        echo -e "  ${GREEN}4)${NC} Cloudflare DNS      ${GRAY}:: Tunnel & DNS${NC}"
+        echo ""
+
+        # SYSTEM
+        echo -e "${YELLOW}  [ SYSTEM OPERATIONS ]${NC}"
+        echo -e "  ${GREEN}5)${NC} System Info         ${GRAY}:: Specs & Status${NC}"
+        echo -e "  ${GREEN}6)${NC} Port Forward        ${GRAY}:: TCP/UDP${NC}"
+        echo ""
+
+        # TERMINAL
+        echo -e "${PURPLE}  [ GUI & TERMINAL ]${NC}"
+        echo -e "  ${GREEN}7)${NC} Web Terminal        ${GRAY}:: Browser Shell${NC}"
+        echo -e "  ${GREEN}8)${NC} RDP Installer       ${GRAY}:: Remote Desktop${NC}"
+        echo ""
+
+        # FOOTER
+        echo -e "${CYAN}════════════════════════════════════════════════════════════${NC}"
+        echo -e "  ${RED}0) Exit Menu${NC}"
+        echo ""
+
+        # INPUT
+        echo -ne "${CYAN} Select Tool → ${NC}"
+        read t
+
+        case $t in
+            1)
+                echo -e "\n${YELLOW}Running Root Access Script...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/root.sh)
+                pause ;;
+
+            2)
+                echo -e "\n${YELLOW}Running Tailscale Installer...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/tailscale.sh)
+                pause ;;
+
+            3)
+                echo -e "\n${YELLOW}Running Zerotier Installer...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/zerotier.sh)
+                pause ;;
+
+            4)
+                echo -e "\n${YELLOW}Running Cloudflare Script...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/cloudflare.sh)
+                pause ;;
+
+            5)
+                echo -e "\n${YELLOW}Fetching System Info...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/info.sh)
+                pause ;;
+
+            6)
+                echo -e "\n${YELLOW}Running TCP Optimizer...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/localtonet.sh)
+                pause ;;
+
+            7)
+                echo -e "\n${YELLOW}Installing Web Terminal...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/terminal.sh)
+                pause ;;
+
+            8)
+                echo -e "\n${YELLOW}Installing RDP...${NC}"
+                bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/main/tools/rdp.sh)
+                pause ;;
+
+            0)
+                break ;;
+
+            *)
+                echo -e "${RED}Invalid Option${NC}"
+                sleep 1 ;;
+        esac
+    done
+}
+
+# EXECUTE
+tools_menu
