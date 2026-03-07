@@ -1,0 +1,162 @@
+#!/bin/bash
+# ===========================================================
+# DEV ENVIRONMENT MANAGER - MINE X NEXT GEN (v11.4)
+# ===========================================================
+
+hostnamectl set-hostname MINE-X 2>/dev/null
+
+# --- COLORS ---
+B_BLUE='\033[1;38;5;33m'
+B_CYAN='\033[1;38;5;51m'
+B_PURPLE='\033[1;38;5;141m'
+B_GREEN='\033[1;38;5;82m'
+B_RED='\033[1;38;5;196m'
+GOLD='\033[38;5;220m'
+W='\033[1;38;5;255m'
+G='\033[0;38;5;244m'
+BG_SHADE='\033[48;5;236m'
+NC='\033[0m'
+
+pause(){ echo; echo -ne " ${G}Press Enter to continue...${NC}"; read _; }
+
+# --- SYSTEM INFO ---
+get_metrics(){
+CPU=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%.0f", $2+$4}')
+RAM=$(free | grep Mem | awk '{printf "%.0f", $3*100/$2}')
+UPT=$(uptime -p | sed 's/up //')
+DISK=$(df -h / | awk 'NR==2 {print $5}')
+CURRENT_HOST=$(hostname)
+
+KVM_STATUS="${B_RED}OFF${NC}"
+if [ -e /dev/kvm ]; then
+KVM_STATUS="${B_GREEN}ON${NC}"
+fi
+}
+
+# --- PANEL MENU ---
+panel_menu(){
+while true; do
+clear
+get_metrics
+
+echo -e "${B_BLUE}HOST:${NC} $CURRENT_HOST | ${B_PURPLE}UPTIME:${NC} $UPT"
+
+echo ""
+echo "=========== MINE X PANEL CENTER ==========="
+
+echo "[1] Install Cockpit"
+echo "[2] Install CasaOS"
+echo "[3] Install 1Panel"
+echo "[0] Back"
+
+echo ""
+read -p "Select: " p_opt
+
+case $p_opt in
+
+1)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/panel/cockpit.sh)
+pause
+;;
+
+2)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/panel/casaos.sh)
+pause
+;;
+
+3)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/panel/1panel.sh)
+pause
+;;
+
+0)
+break
+;;
+
+*)
+echo "Invalid"
+sleep 1
+;;
+
+esac
+done
+}
+
+# --- MAIN UI ---
+render_ui(){
+clear
+get_metrics
+
+echo "========================================"
+echo "            MINE X MANAGER"
+echo "========================================"
+
+echo "CPU: $CPU%"
+echo "RAM: $RAM%"
+echo "DISK: $DISK"
+echo "UPTIME: $UPT"
+echo "KVM: $KVM_STATUS"
+
+echo ""
+echo "[1] Setup IDX Environment"
+echo "[2] Launch VM-1"
+echo "[3] Launch VM-2"
+echo "[4] Panel Control Center"
+echo "[5] LXC Manager"
+echo "[6] Docker Setup"
+echo "[0] Exit"
+
+echo ""
+read -p "Command: " opt
+}
+
+# --- MAIN LOOP ---
+while true; do
+render_ui
+
+case $opt in
+
+1)
+echo "Initializing IDX..."
+mkdir -p "$HOME/vm/.idx"
+echo "IDX environment ready"
+pause
+;;
+
+2)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/vm-1.sh)
+pause
+;;
+
+3)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/auto.sh)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/vm-2.sh)
+pause
+;;
+
+4)
+panel_menu
+;;
+
+5)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/lxc.sh)
+pause
+;;
+
+6)
+bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/vps/Docker.sh)
+pause
+;;
+
+0)
+echo "Exiting MINE X..."
+exit
+;;
+
+*)
+echo "Invalid option"
+sleep 1
+;;
+
+esac
+done
