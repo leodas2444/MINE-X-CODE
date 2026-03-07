@@ -1,0 +1,188 @@
+#!/bin/bash
+
+# ==================================================
+#  MINE X CONTROL PANEL v1.0 | Auto-Detect System
+# ==================================================
+
+# --- COLORS ---
+R="\e[31m"
+G="\e[32m"
+Y="\e[33m"
+B="\e[34m"
+M="\e[35m"
+C="\e[36m"
+W="\e[97m"
+GR="\e[90m"
+N="\e[0m"
+BOLD="\e[1m"
+
+# --- SYSTEM AUTO DETECT ---
+detect_system() {
+
+if [ -f /etc/os-release ]; then
+. /etc/os-release
+OS_NAME=$PRETTY_NAME
+else
+OS_NAME=$(uname -s)
+fi
+
+PUBLIC_IP=$(curl -s --max-time 2 https://ipinfo.io/ip || echo "Unknown")
+LOCAL_IP=$(hostname -I | awk '{print $1}')
+
+if command -v free >/dev/null 2>&1; then
+RAM_USED=$(free -h | awk '/^Mem:/ {print $3 "/" $2}')
+else
+RAM_USED="N/A"
+fi
+
+}
+
+# --- UI ---
+header(){
+
+clear
+
+echo -e "${B} ╔════════════════════════════════════════════════════════════╗${N}"
+echo -e "${B} ║${W}${BOLD}   ⚡ MINE X CONTROL PANEL ${GR}::${C} SERVER AUTOMATION        ${B}║${N}"
+echo -e "${B} ╠════════════════════════════════════════════════════════════╣${N}"
+
+printf "${B} ║${GR}  OS   :${W} %-23s ${GR}WAN:${W} %-15s ${B}║${N}\n" "${OS_NAME:0:20}" "${PUBLIC_IP}"
+printf "${B} ║${GR}  RAM  :${W} %-23s ${GR}LAN:${W} %-15s ${B}║${N}\n" "${RAM_USED}" "${LOCAL_IP}"
+
+echo -e "${B} ╚════════════════════════════════════════════════════════════╝${N}"
+echo ""
+
+}
+
+# --- MENU ---
+show_menu(){
+
+echo -e "${W}  AVAILABLE MODULES:${N}"
+echo -e "${GR}  ──────────────────────────────────────────────────────────${N}"
+
+echo -e "  ${B}[1]${N} ${C}SSL Configuration${GR} :: Certbot / Nginx${N}"
+echo -e "  ${B}[2]${N} ${G}Install Wings${GR} :: MineX Script${N}"
+echo -e "  ${B}[3]${N} ${Y}Auto Setup${GR} :: One Click${N}"
+echo -e "  ${B}[4]${N} ${Y}Wings Manager${GR} :: Manage Wings${N}"
+echo -e "  ${B}[5]${N} ${M}Database Manager${GR} :: MySQL/MariaDB${N}"
+echo -e "  ${B}[6]${N} ${R}Uninstall Wings${GR} :: Remove Wings${N}"
+
+echo -e "${GR}  ──────────────────────────────────────────────────────────${N}"
+echo -e "  ${B}[0]${N} ${W}Exit System${N}"
+echo ""
+
+}
+
+# --- SSL SETUP ---
+ssl_setup(){
+
+header
+
+echo -e "${C}┌─[ ${W}SSL CONFIGURATION ${C}]${N}"
+echo -e "${C}│${N} Auto-detected IP: ${G}$PUBLIC_IP${N}"
+echo -ne "${C}└─╼ ${W}Enter Domain: ${N}"
+
+read DOMAIN
+
+if [[ -z "$DOMAIN" ]]; then
+echo -e "\n${R}✖ Setup aborted.${N}"
+sleep 1
+return
+fi
+
+echo -e "\n${Y}➜ Installing dependencies...${N}"
+
+apt update -y >/dev/null 2>&1
+apt install -y certbot python3-certbot-nginx >/dev/null 2>&1
+
+echo -e "${Y}➜ Requesting certificate...${N}"
+
+rm -rf /etc/letsencrypt/live/$DOMAIN
+rm -rf /etc/letsencrypt/archive/$DOMAIN
+rm -rf /etc/letsencrypt/renewal/$DOMAIN.conf
+
+certbot certonly --nginx -d "$DOMAIN" --non-interactive --agree-tos --email "ssl@$DOMAIN"
+
+echo -e "\n${G}✔ SSL Setup Complete.${N}"
+
+read -p "Press Enter..."
+}
+
+# --- UNINSTALL ---
+uninstall_menu(){
+
+clear
+
+echo -e "${R}╔════════════════════════════════════════════════════════════╗${N}"
+echo -e "${R}║              ⚠️  DANGER ZONE: UNINSTALL                   ║${N}"
+echo -e "${R}╚════════════════════════════════════════════════════════════╝${N}"
+
+echo -ne "${R}Are you sure? [y/N]: ${N}"
+read CONFIRM
+
+[[ "$CONFIRM" != "y" ]] && return
+
+echo -e "\n${Y}➜ Removing Wings...${N}"
+
+systemctl disable --now wings 2>/dev/null
+rm -f /etc/systemd/system/wings.service
+rm -rf /etc/pterodactyl
+rm -rf /var/lib/pterodactyl
+rm -f /usr/local/bin/wings
+
+docker system prune -a -f 2>/dev/null
+
+echo -e "\n${G}✔ Uninstall Complete.${N}"
+
+sleep 2
+}
+
+# --- STARTUP ---
+echo -e "${C}Detecting system...${N}"
+detect_system
+
+# --- MAIN LOOP ---
+while true
+do
+
+header
+show_menu
+
+echo -ne "${C}root@minex-panel:~# ${N}"
+read opt
+
+case $opt in
+
+1) ssl_setup ;;
+
+2)
+bash <(curl -fsSL https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/wings/install.sh)
+;;
+
+3)
+bash <(curl -fsSL https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/wings/setup.sh)
+;;
+
+4)
+bash <(curl -fsSL https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/wings/Manag)
+;;
+
+5)
+bash <(curl -fsSL https://raw.githubusercontent.com/leodas2444/MINEX/refs/heads/main/ptero/wings/db.sh)
+;;
+
+6) uninstall_menu ;;
+
+0)
+echo -e "\n${G}Goodbye from MINE X.${N}"
+exit 0
+;;
+
+*)
+echo -e "${R}Invalid Option${N}"
+sleep 1
+;;
+
+esac
+
+done
