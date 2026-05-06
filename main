@@ -1,84 +1,200 @@
 #!/bin/bash
 # ===========================================================
-# MINE X CLOUD- OBSIDIAN NEXT GEN (v11.2 - Custom Banner)
-# Style: Segmented UI / Glass-Look / MINE X IS KING
+# ███╗   ███╗██╗███╗   ██╗███████╗    ██╗  ██╗
+# ████╗ ████║██║████╗  ██║██╔════╝    ╚██╗██╔╝
+# ██╔████╔██║██║██╔██╗ ██║█████╗       ╚███╔╝
+# ██║╚██╔╝██║██║██║╚██╗██║██╔══╝       ██╔██╗
+# ██║ ╚═╝ ██║██║██║ ╚████║███████╗    ██╔╝ ██╗
+# ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝    ╚═╝  ╚═╝
+#
+#        ⚡ MINE X CLOUD :: OBSIDIAN CORE v12 ⚡
 # ===========================================================
 
-# --- 0. PRE-INITIALIZATION ---
-# Change hostname to MINE X before rendering
-
-# --- PRECISE COLORS ---
-B_BLUE='\033[1;38;5;33m'
+# =========================
+# COLORS / STYLE
+# =========================
+B_BLUE='\033[1;38;5;39m'
 B_CYAN='\033[1;38;5;51m'
-B_PURPLE='\033[1;38;5;141m'
+B_PURPLE='\033[1;38;5;135m'
 B_GREEN='\033[1;38;5;82m'
 B_RED='\033[1;38;5;196m'
-GOLD='\033[38;5;220m'
-W='\033[1;38;5;255m'
-G='\033[0;38;5;244m'
-BG_SHADE='\033[48;5;236m' 
+B_YELLOW='\033[1;38;5;220m'
+B_PINK='\033[1;38;5;213m'
+B_WHITE='\033[1;38;5;255m'
+GRAY='\033[38;5;245m'
+DARK='\033[48;5;236m'
 NC='\033[0m'
 
-# --- REAL-TIME ANALYTICS ---
+# =========================
+# SYSTEM METRICS
+# =========================
 get_metrics() {
     CPU=$(top -bn1 | grep "Cpu(s)" | awk '{printf "%.0f", $2+$4}')
     RAM=$(free | grep Mem | awk '{printf "%.0f", $3*100/$2}')
-    UPT=$(uptime -p | sed 's/up //')
     DISK=$(df -h / | awk 'NR==2 {print $5}')
-    CURRENT_HOST=$(hostname)
+    HOST=$(hostname)
+    KERNEL=$(uname -r)
+    UPTIME=$(uptime -p | sed 's/up //')
+    IP=$(curl -s ifconfig.me 2>/dev/null)
 }
 
-# --- THE UI RENDERER ---
+# =========================
+# PROGRESS BAR
+# =========================
+progress_bar() {
+    local percent=$1
+    local filled=$((percent / 5))
+    local empty=$((20 - filled))
+
+    printf "${B_GREEN}"
+    for ((i=0; i<filled; i++)); do printf "█"; done
+    printf "${GRAY}"
+    for ((i=0; i<empty; i++)); do printf "░"; done
+    printf "${NC} ${B_WHITE}%s%%%s" "$percent" "${NC}"
+}
+
+# =========================
+# HEADER
+# =========================
+render_header() {
+    echo -e "${B_CYAN}"
+    echo "███╗   ███╗██╗███╗   ██╗███████╗    ██╗  ██╗     ██████╗██╗      ██████╗ ██╗   ██╗██████╗ "
+    echo "████╗ ████║██║████╗  ██║██╔════╝    ╚██╗██╔╝    ██╔════╝██║     ██╔═══██╗██║   ██║██╔══██╗"
+    echo -e "${B_PURPLE}██╔████╔██║██║██╔██╗ ██║█████╗       ╚███╔╝     ██║     ██║     ██║   ██║██║   ██║██║  ██║"
+    echo "██║╚██╔╝██║██║██║╚██╗██║██╔══╝       ██╔██╗     ██║     ██║     ██║   ██║██║   ██║██║  ██║"
+    echo -e "${B_YELLOW}██║ ╚═╝ ██║██║██║ ╚████║███████╗    ██╔╝ ██╗    ╚██████╗███████╗╚██████╔╝╚██████╔╝██████╔╝"
+    echo "╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝    ╚═╝  ╚═╝     ╚═════╝╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝ "
+    echo -e "${NC}"
+
+    echo -e " ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e " ${B_WHITE}⚡ Powered By:${NC} ${B_CYAN}MINE X CODING${NC} ${GRAY}|${NC} ${B_WHITE}Version:${NC} ${B_GREEN}v12 NEXT GEN${NC}"
+    echo -e " ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
+
+# =========================
+# MAIN UI
+# =========================
 render_ui() {
     clear
     get_metrics
-    
-    # --- TOP STATUS PILLS ---
-    echo -e " ${B_BLUE}${NC}${BG_SHADE}${W}   HOST: $CURRENT_HOST ${NC}${B_BLUE}${NC}  ${B_PURPLE}${NC}${BG_SHADE}${W}   $UPT ${NC}${B_PURPLE}${NC}  ${B_GREEN}${NC}${BG_SHADE}${W}   $DISK ${NC}${B_GREEN}${NC}"
-    echo -e ""
+    render_header
 
-# --- MINE X CLOUD LARGE BANNER (GRADIENT EFFECT) ---
-echo -e "${B_CYAN}███╗   ███╗██╗███╗   ██╗███████╗    ██╗  ██╗     ██████╗██╗      ██████╗ ██╗   ██╗██████╗ ${NC}"
-echo -e "${B_CYAN}████╗ ████║██║████╗  ██║██╔════╝    ╚██╗██╔╝    ██╔════╝██║     ██╔═══██╗██║   ██║██╔══██╗${NC}"
-echo -e "${B_PURPLE}██╔████╔██║██║██╔██╗ ██║█████╗       ╚███╔╝     ██║     ██║     ██║   ██║██║   ██║██║  ██║${NC}"
-echo -e "${B_PURPLE}██║╚██╔╝██║██║██║╚██╗██║██╔══╝       ██╔██╗     ██║     ██║     ██║   ██║██║   ██║██║  ██║${NC}"
-echo -e "${GOLD}██║ ╚═╝ ██║██║██║ ╚████║███████╗    ██╔╝ ██╗    ╚██████╗███████╗╚██████╔╝╚██████╔╝██████╔╝${NC}"
-echo -e "${GOLD}╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝    ╚═╝  ╚═╝     ╚═════╝╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝ ${NC}"
-    
-    echo -e "  ${G}───────────────────────────────────────────────────────────────────────────${NC}"
-    
-    # --- DASHBOARD CORE ---
-    echo -e "  ${W}System Health:${NC}"
-    printf "  ${G}CPU:${NC} ${B_CYAN}%-4s${NC} ${G}RAM:${NC} ${B_PURPLE}%-4s${NC} ${G}Network:${NC} ${B_GREEN}CONNECTED${NC}\n" "$CPU%" "$RAM%"
-    echo -e ""
+    echo ""
+    echo -e " ${B_BLUE}${NC}${DARK}${B_WHITE} HOST ${NC}${B_BLUE}${NC} ${B_CYAN}$HOST${NC}"
+    echo -e " ${B_PURPLE}${NC}${DARK}${B_WHITE} KERNEL ${NC}${B_PURPLE}${NC} ${B_GREEN}$KERNEL${NC}"
+    echo -e " ${B_YELLOW}${NC}${DARK}${B_WHITE} IP ${NC}${B_YELLOW}${NC} ${B_PINK}$IP${NC}"
+    echo -e " ${B_GREEN}${NC}${DARK}${B_WHITE} UPTIME ${NC}${B_GREEN}${NC} ${B_WHITE}$UPTIME${NC}"
 
-    # --- ACTION GRID (SEGMENTED) ---
-    echo -e "  ${B_CYAN}  DEPLOYMENT SERVICES${NC}"
-    echo -e "  ${G}├─ ${W}[1]${NC} Pterodactyl Panel         ${G}├─ ${W}[4]${NC} System Optimizer"
-    echo -e "  ${G}└─ ${W}[2]${NC} Install Wings Node        ${G}├─ ${W}[3]${NC} Theme Configurator"   
-    echo -e ""
-    
-               ${B_RED}${NC}${BG_SHADE}${W} [8] SHUTDOWN ${NC}${B_RED}${NC}"
-    
-    # --- INTERACTIVE FOOTER ---
-    echo -e "\n  ${G}───────────────────────────────────────────────────────────────────────────${NC}"
-    echo -ne "  ${B_CYAN}➜${NC} ${W}Command${NC} ${G}(1-8):${NC} "
+    echo ""
+    echo -e " ${GRAY}━━━━━━━━━━━━━━━━━━ ${B_CYAN}SYSTEM ANALYTICS${NC} ${GRAY}━━━━━━━━━━━━━━━━━━${NC}"
+
+    printf " ${B_WHITE}CPU Usage:${NC} "
+    progress_bar "$CPU"
+    echo ""
+
+    printf " ${B_WHITE}RAM Usage:${NC} "
+    progress_bar "$RAM"
+    echo ""
+
+    echo -e " ${B_WHITE}Disk Usage:${NC} ${B_YELLOW}$DISK${NC}"
+    echo -e " ${B_WHITE}Network:${NC} ${B_GREEN}ONLINE${NC}"
+
+    echo ""
+    echo -e " ${GRAY}━━━━━━━━━━━━━━━━━━ ${B_PURPLE}DEPLOYMENT PANEL${NC} ${GRAY}━━━━━━━━━━━━━━━━━━${NC}"
+
+    echo -e " ${B_CYAN}[1]${NC} Install Pterodactyl Panel"
+    echo -e " ${B_CYAN}[2]${NC} Install Wings Node"
+    echo -e " ${B_CYAN}[3]${NC} Install Themes"
+    echo -e " ${B_CYAN}[4]${NC} System Optimizer"
+    echo -e " ${B_CYAN}[5]${NC} Docker Installer"
+    echo -e " ${B_CYAN}[6]${NC} NodeJS Installer"
+    echo -e " ${B_CYAN}[7]${NC} Server Monitor"
+
+    echo ""
+    echo -e " ${GRAY}━━━━━━━━━━━━━━━━━━ ${B_RED}POWER CONTROL${NC} ${GRAY}━━━━━━━━━━━━━━━━━━${NC}"
+
+    echo -e " ${B_RED}[8]${NC} Shutdown Panel"
+
+    echo ""
+    echo -e " ${GRAY}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -ne " ${B_CYAN}➜${NC} ${B_WHITE}Select Option${NC} ${GRAY}(1-8): ${NC}"
 }
 
-# --- CONTROLLER ---
+# =========================
+# LOADING EFFECT
+# =========================
+loading() {
+    echo ""
+    echo -ne " ${B_GREEN}Loading"
+    for i in {1..5}; do
+        echo -ne "."
+        sleep 0.2
+    done
+    echo -e "${NC}"
+}
+
+# =========================
+# MAIN LOOP
+# =========================
 while true; do
     render_ui
     read -r opt
+
     case $opt in
-        1) bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/al) ;;
-        2) bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/wings) ;;
-        3) bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/blue) ;;
-        4) bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/tools) ;;
-        8|exit) 
-            echo -e "\n  ${B_RED}DISCONNECTED.${NC} Goodbye, LEO ."
-            exit 0 ;;
-        *) 
-            echo -e "  ${B_RED}Error: Input Invalid!${NC}"
-            sleep 0.5 ;;
+        1)
+            loading
+            bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/al)
+        ;;
+
+        2)
+            loading
+            bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/wings)
+        ;;
+
+        3)
+            loading
+            bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/blue)
+        ;;
+
+        4)
+            loading
+            bash <(curl -s https://raw.githubusercontent.com/leodas2444/MINE-X-CODE/refs/heads/main/tools)
+        ;;
+
+        5)
+            loading
+            curl -fsSL https://get.docker.com | bash
+        ;;
+
+        6)
+            loading
+            curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            apt install -y nodejs
+        ;;
+
+        7)
+            clear
+            htop
+        ;;
+
+        8|exit)
+            clear
+            echo -e "${B_RED}"
+            echo " ██████╗ ██╗   ██╗███████╗"
+            echo "██╔════╝ ██║   ██║██╔════╝"
+            echo "██║  ███╗██║   ██║█████╗  "
+            echo "██║   ██║██║   ██║██╔══╝  "
+            echo "╚██████╔╝╚██████╔╝███████╗"
+            echo " ╚═════╝  ╚═════╝ ╚══════╝"
+            echo -e "${NC}"
+            echo -e " ${B_RED}MINE X CLOUD DISCONNECTED.${NC}"
+            echo -e " ${GRAY}Session terminated successfully.${NC}"
+            exit 0
+        ;;
+
+        *)
+            echo -e "\n ${B_RED}Invalid Option Detected.${NC}"
+            sleep 1
+        ;;
     esac
 done
